@@ -1,4 +1,5 @@
 import { sendWhatsAppMessage } from "@/lib/whatsapp";
+import { generateAIResponse } from "@/lib/openai";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -57,10 +58,9 @@ export async function POST(request: Request) {
         text,
       });
 
-      await sendWhatsAppMessage(
-        from,
-        `Hola ${userName} 👋 Recibí tu mensaje: "${text}"`,
-      );
+      const aiResponse = await generateAIResponse(userName, text);
+
+      await sendWhatsAppMessage(from, aiResponse);
     }
 
     return Response.json({ status: "ok" }, { status: 200 });
