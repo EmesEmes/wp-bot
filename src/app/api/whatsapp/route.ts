@@ -1,3 +1,5 @@
+import { sendWhatsAppMessage } from "@/lib/whatsapp";
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
 
@@ -33,8 +35,8 @@ export async function POST(request: Request) {
     const value = change.value;
     const message = value?.messages?.[0];
 
-    // Algunos webhooks de "messages" son estados de mensajes
-    // y no contienen un mensaje entrante.
+    // También llegan webhooks de estados:
+    // enviado, entregado, leído, etc.
     if (!message) {
       return Response.json({ status: "ok" }, { status: 200 });
     }
@@ -54,14 +56,17 @@ export async function POST(request: Request) {
         messageId,
         text,
       });
-    } else {
-      console.log(`Mensaje de tipo ${messageType} recibido de ${from}`);
+
+      await sendWhatsAppMessage(
+        from,
+        `Hola ${userName} 👋 Recibí tu mensaje: "${text}"`,
+      );
     }
 
     return Response.json({ status: "ok" }, { status: 200 });
   } catch (error) {
     console.error("Error procesando webhook:", error);
 
-    return Response.json({ error: "Invalid request" }, { status: 400 });
+    return Response.json({ error: "Internal server error" }, { status: 500 });
   }
 }
