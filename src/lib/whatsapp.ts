@@ -31,8 +31,13 @@ export async function sendWhatsAppMessage(to: string, text: string) {
   const data = await response.json();
 
   if (!response.ok) {
-    console.error("Error de WhatsApp:", data);
-    throw new Error("No se pudo enviar el mensaje de WhatsApp");
+    console.error("Error de WhatsApp:", JSON.stringify(data, null, 2));
+
+    throw new Error(
+      `No se pudo enviar el mensaje de WhatsApp: ${
+        data?.error?.message ?? "Error desconocido"
+      }`,
+    );
   }
 
   return data;

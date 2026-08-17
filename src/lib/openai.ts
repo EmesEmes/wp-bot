@@ -38,6 +38,6 @@ Reglas:
 Mensaje del usuario:
 ${message}`,
   });
-
+  console.log("Respuesta OpenAI:", response.output_text);
   return response.output_text;
 }
