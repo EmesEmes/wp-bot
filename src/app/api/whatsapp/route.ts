@@ -19,3 +19,18 @@ export async function GET(request: Request) {
     status: 403,
   });
 }
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+
+    console.log("Webhook recibido:");
+    console.log(JSON.stringify(body, null, 2));
+
+    return Response.json({ status: "ok" }, { status: 200 });
+  } catch (error) {
+    console.error("Error procesando webhook:", error);
+
+    return Response.json({ error: "Invalid request" }, { status: 400 });
+  }
+}
