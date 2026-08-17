@@ -24,8 +24,39 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    console.log("Webhook recibido:");
-    console.log(JSON.stringify(body, null, 2));
+    const change = body.entry?.[0]?.changes?.[0];
+
+    if (change?.field !== "messages") {
+      return Response.json({ status: "ignored" }, { status: 200 });
+    }
+
+    const value = change.value;
+    const message = value?.messages?.[0];
+
+    // Algunos webhooks de "messages" son estados de mensajes
+    // y no contienen un mensaje entrante.
+    if (!message) {
+      return Response.json({ status: "ok" }, { status: 200 });
+    }
+
+    const from = message.from;
+    const messageId = message.id;
+    const messageType = message.type;
+    const userName = value.contacts?.[0]?.profile?.name ?? "Usuario";
+
+    if (messageType === "text") {
+      const text = message.text?.body;
+
+      console.log("Nuevo mensaje de WhatsApp:");
+      console.log({
+        from,
+        userName,
+        messageId,
+        text,
+      });
+    } else {
+      console.log(`Mensaje de tipo ${messageType} recibido de ${from}`);
+    }
 
     return Response.json({ status: "ok" }, { status: 200 });
   } catch (error) {
