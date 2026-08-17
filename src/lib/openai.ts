@@ -1,10 +1,20 @@
 import OpenAI from "openai";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+function getOpenAIClient() {
+  const apiKey = process.env.OPENAI_API_KEY;
+
+  if (!apiKey) {
+    throw new Error("OPENAI_API_KEY no está configurada");
+  }
+
+  return new OpenAI({
+    apiKey,
+  });
+}
 
 export async function generateAIResponse(userName: string, message: string) {
+  const openai = getOpenAIClient();
+
   const response = await openai.responses.create({
     model: process.env.OPENAI_MODEL ?? "gpt-5-mini",
 
